@@ -1,19 +1,17 @@
+const { builtinModules } = require("module")
 const path = require("path");
-const { readConfig } = require("@remix-run/dev/config");
+
+const { ESBuildMinifyPlugin } = require("esbuild-loader");
 const webpack = require("webpack");
 const VirtualModulesPlugin = require("webpack-virtual-modules");
-const { ESBuildMinifyPlugin } = require("esbuild-loader");
-const { builtinModules } = require("module")
+
+/** @type {<K,V1,V2>(obj: Record<K,V1>, f: (entry: [K,V1]) => [K,V2]) => Record<K,V2>} */
+const objectMap = (obj, f) => Object.fromEntries(Object.entries(obj).map(f));
 
 const mode = process.env.NODE_ENV === "development" ? "development" : "production";
 
-/** @type {<Obj extends Record, K extends keyof Obj,V1 extends Obj[K],V2>(obj: Obj, f: (entry: [K,V1]) => [K,V2]) => Record<string,V2>} */
-const objectMap = (obj, f) => Object.fromEntries(Object.entries(obj).map(f));
-
-/** @type { () => import('webpack').Configuration } */
-module.exports = async () => {
-  const remixConfig = await readConfig();
-
+/** @type { (remixConfig: import("@remix-run/dev/config").RemixConfig) => import('webpack').Configuration} */
+module.exports = (remixConfig) => {
   const routes = objectMap(remixConfig.routes, ([id, route]) => [
     id,
     path.resolve(
@@ -39,7 +37,7 @@ module.exports = async () => {
     target: "web",
     resolve: {
       alias: {
-        "~": path.resolve(__dirname, "app"),
+        "~": remixConfig.appDirectory
         // TODO grab aliases from tsconfig
       },
       extensions: [".tsx", ".ts", ".jsx", ".js", ".mjs"],
@@ -67,7 +65,7 @@ module.exports = async () => {
         },
         {
           test: /\/__remix_browser_route__/,
-          loader: require.resolve("./remix-browser-routes-loader.cjs"),
+          loader: require.resolve("./compiler-webpack/browser-routes-loader.cjs"),
           options: { remixConfig },
         },
         {
