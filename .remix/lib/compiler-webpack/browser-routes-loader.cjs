@@ -1,35 +1,6 @@
-let os = require("os");
+const esbuild = require("esbuild");
 
-let esbuild = require("esbuild");
-
-/**
- * @param {import("./config-types").RemixWebpackConfig} remixConfig
- * @returns {string[]}
- */
-async function getExports(routePath, remixConfig) {
-  let { metafile, errors } = await esbuild.build({
-    sourceRoot: remixConfig.appDirectory,
-    entryPoints: [routePath],
-    target: "esnext",
-    bundle: false,
-    metafile: true,
-    write: false,
-    outdir: os.tmpdir(),
-  });
-
-  if (errors?.length > 0) {
-    throw new Error(
-      await esbuild.formatMessages(errors, { kind: "error" }).join("\n")
-    );
-  }
-
-  let outputs = Object.values(metafile.outputs);
-  if (outputs.length !== 1) {
-    throw Error();
-  }
-  let output = outputs[0];
-  return output.exports;
-}
+const { getExports } = require("../get-exports.cjs")
 
 const BROWSER_EXPORTS = [
   "CatchBoundary",
@@ -42,7 +13,7 @@ const BROWSER_EXPORTS = [
 ];
 
 async function treeshakeBrowserExports(routePath, remixConfig) {
-  let xports = await getExports(routePath, remixConfig);
+  let xports = getExports(routePath, remixConfig);
   let browserExports = xports.filter((xport) =>
     BROWSER_EXPORTS.includes(xport)
   );

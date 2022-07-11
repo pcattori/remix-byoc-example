@@ -1,16 +1,19 @@
-const { builtinModules } = require("module")
+const { builtinModules } = require("module");
 const path = require("path");
 
 const { ESBuildMinifyPlugin } = require("esbuild-loader");
 const webpack = require("webpack");
 const VirtualModulesPlugin = require("webpack-virtual-modules");
 
-/** @type {<K,V1,V2>(obj: Record<K,V1>, f: (entry: [K,V1]) => [K,V2]) => Record<K,V2>} */
-const objectMap = (obj, f) => Object.fromEntries(Object.entries(obj).map(f));
+const { objectMap } = require("./lib/object-map.cjs");
 
-const mode = process.env.NODE_ENV === "development" ? "development" : "production";
+/** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
 
-/** @type { (remixConfig: import("@remix-run/dev/config").RemixConfig) => import('webpack').Configuration} */
+const mode =
+  "development"
+  // process.env.NODE_ENV === "development" ? "development" : "production";
+
+/** @type { (remixConfig: RemixConfig) => import('webpack').Configuration} */
 module.exports = (remixConfig) => {
   const routes = objectMap(remixConfig.routes, ([id, route]) => [
     id,
@@ -37,11 +40,11 @@ module.exports = (remixConfig) => {
     target: "web",
     resolve: {
       alias: {
-        "~": remixConfig.appDirectory
+        "~": remixConfig.appDirectory,
         // TODO grab aliases from tsconfig
       },
       extensions: [".tsx", ".ts", ".jsx", ".js", ".mjs"],
-      fallback: Object.fromEntries(builtinModules.map(m => [m, false])),
+      fallback: Object.fromEntries(builtinModules.map((m) => [m, false])),
     },
     optimization: {
       splitChunks: {
@@ -49,9 +52,7 @@ module.exports = (remixConfig) => {
       },
       usedExports: true,
       minimize: mode === "production",
-      minimizer: [
-        new ESBuildMinifyPlugin({ target: "es2019" }),
-      ],
+      minimizer: [new ESBuildMinifyPlugin({ target: "es2019" })],
     },
     experiments: { outputModule: true },
     externalsType: "module",
@@ -59,13 +60,15 @@ module.exports = (remixConfig) => {
     module: {
       rules: [
         {
-          // interop between cjs,mjs,etc.. in the same build
+          // https://github.com/aws-amplify/amplify-js/issues/7260#issuecomment-840750788
           test: /\.m?js$/,
           resolve: { fullySpecified: false },
         },
         {
           test: /\/__remix_browser_route__/,
-          loader: require.resolve("./compiler-webpack/browser-routes-loader.cjs"),
+          loader: require.resolve(
+            "./lib/compiler-webpack/browser-routes-loader.cjs"
+          ),
           options: { remixConfig },
         },
         {
@@ -74,8 +77,8 @@ module.exports = (remixConfig) => {
           exclude: /node_modules/,
           options: {
             target: "es2019",
-            loader: "tsx"
-          }
+            loader: "tsx",
+          },
         },
         {
           test: /\.css$/i,
@@ -87,19 +90,16 @@ module.exports = (remixConfig) => {
       path: remixConfig.assetsBuildDirectory,
       module: true,
       library: { type: "module" },
+      publicPath: remixConfig.publicPath,
       filename: "[name]-[contenthash].js",
       chunkFormat: "module",
       chunkFilename: "chunk-[contenthash].js",
-      assetModuleFilename: "_assets/[name]-[contenthash]",
+      assetModuleFilename: "_assets/[name]-[contenthash][ext]",
     },
     plugins: [
-      new VirtualModulesPlugin(objectMap(routes, ([,route]) => [route, ""])),
-      new webpack.IgnorePlugin({
-        resourceRegExp: /\.server(\.[t|j]sx?)?$/,
-      }),
-      new webpack.ProvidePlugin({
-        React: ["react"]
-      }),
+      new VirtualModulesPlugin(objectMap(routes, ([, route]) => [route, ""])),
+      new webpack.IgnorePlugin({ resourceRegExp: /\.server(\.[t|j]sx?)?$/ }),
+      new webpack.ProvidePlugin({ React: ["react"] }),
     ],
   };
 };

@@ -1,44 +1,23 @@
-import fs from "fs";
-import path from "path";
+import { createRequire } from "module";
 
 import { readConfig } from "@remix-run/dev/config.js";
 
-import { compileBrowser } from "./compiler-webpack/index.mjs";
+import { build } from "./lib/build.mjs";
+import { createCompileBrowser, createCompileServer } from "./lib/compiler-webpack/index.mjs";
+// import { createCompileBrowser, createCompileServer } from "./lib/compiler-esbuild/index.mjs";
 
-/** @typedef {import("@remix-run/dev/compiler/assets").AssetsManifest} AssetsManifest */
-/** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
-/** @typedef {(remixConfig: RemixConfig) => Promise<AssetsManifest>} CompileBrowser */
-
-// type CompileServer = (
-//   remixConfig: RemixConfig,
-//   manifestPromise: Promise<Manifest>
-// ) => void;
-
-/** @type {(remixConfig: RemixConfig, compileBrowser: CompileBrowser) => Promise<[AssetsManifest]>} */
-export async function build(remixConfig, compileBrowser) {
-  let manifestPromise = compileBrowser(remixConfig);
-
-  // write manifest
-  manifestPromise.then((manifest) => {
-    fs.mkdirSync(remixConfig.assetsBuildDirectory, { recursive: true });
-    fs.writeFileSync(
-      path.resolve(
-        remixConfig.assetsBuildDirectory,
-        path.basename(manifest.url)
-      ),
-      `window.__remixManifest=${JSON.stringify(manifest)};`
-    );
-  });
-
-  return Promise.all([manifestPromise]);
-  // let serverPromise = compile.server(remixConfig, manifestPromise);
-  // return Promise.all([manifestPromise, serverPromise]);
-}
-
-// export async function watch({ watchBrowser, watchServer }: Compiler) {}
+const require = createRequire(import.meta.url);
 
 async function main() {
+  console.time("Remix Compile")
   let remixConfig = await readConfig();
-  await build(remixConfig, compileBrowser);
+  let compile = {
+    browser: createCompileBrowser(require("./webpack.config.browser.js")),
+    // browser: createCompileBrowser(require("./esbuild.config.browser.js")),
+    server: createCompileServer(require("./webpack.config.server.js")),
+    // server: createCompileServer(require("./esbuild.config.server.js")),
+  }
+  await Promise.all(build(remixConfig, compile));
+  console.timeEnd("Remix Compile")
 }
-main().then((_) => console.log("done"));
+main()
