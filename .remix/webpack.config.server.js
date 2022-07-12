@@ -49,6 +49,8 @@ module.exports = (remixConfig, manifest) => {
   return {
     mode,
     devtool: mode === "development" ? "inline-cheap-source-map" : undefined,
+
+    context: remixConfig.rootDirectory,
     target: "node",
     resolve: {
       alias: {
@@ -56,6 +58,9 @@ module.exports = (remixConfig, manifest) => {
         // TODO grab aliases from tsconfig
       },
       extensions: [".tsx", ".ts", ".jsx", ".js", ".mjs"],
+    },
+    optimization: {
+      moduleIds: "deterministic",
     },
     experiments: isModule ? { outputModule: true } : undefined,
     externalsType: isModule ? "module" : undefined,

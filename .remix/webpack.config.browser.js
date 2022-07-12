@@ -37,6 +37,7 @@ module.exports = (remixConfig) => {
     mode,
     devtool: mode === "development" ? "inline-cheap-source-map" : undefined,
 
+    context: remixConfig.rootDirectory,
     target: "web",
     resolve: {
       alias: {
@@ -47,6 +48,8 @@ module.exports = (remixConfig) => {
       fallback: Object.fromEntries(builtinModules.map((m) => [m, false])),
     },
     optimization: {
+      moduleIds: "deterministic",
+      runtimeChunk: "single",
       splitChunks: {
         chunks: "all",
       },
@@ -54,12 +57,14 @@ module.exports = (remixConfig) => {
       minimize: mode === "production",
       minimizer: [new ESBuildMinifyPlugin({ target: "es2019" })],
     },
+    // TODO move `module` stuff to plugin. warn/fail if user sets this to something other than module
     experiments: { outputModule: true },
     externalsType: "module",
     entry,
     module: {
       rules: [
         {
+          // TODO: summary of when you need this
           // https://github.com/aws-amplify/amplify-js/issues/7260#issuecomment-840750788
           test: /\.m?js$/,
           resolve: { fullySpecified: false },
@@ -93,10 +98,15 @@ module.exports = (remixConfig) => {
       publicPath: remixConfig.publicPath,
       filename: "[name]-[contenthash].js",
       chunkFormat: "module",
-      chunkFilename: "chunk-[contenthash].js",
+      chunkLoading: "import",
+      chunkFilename: "[name]-[contenthash].js",
       assetModuleFilename: "_assets/[name]-[contenthash][ext]",
     },
     plugins: [
+      // TODO define plugin vs environment plugin?
+      new webpack.EnvironmentPlugin({
+        REMIX_DEV_SERVER_WS_PORT: JSON.stringify(remixConfig.devServerPort),
+      }),
       new VirtualModulesPlugin(objectMap(routes, ([, route]) => [route, ""])),
       new webpack.IgnorePlugin({ resourceRegExp: /\.server(\.[t|j]sx?)?$/ }),
       new webpack.ProvidePlugin({ React: ["react"] }),
