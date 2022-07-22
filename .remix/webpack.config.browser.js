@@ -1,11 +1,6 @@
-const { builtinModules } = require("module");
-const path = require("path");
-
 const { ESBuildMinifyPlugin } = require("esbuild-loader");
-const webpack = require("webpack");
-const VirtualModulesPlugin = require("webpack-virtual-modules");
 
-const { objectMap } = require("./lib/object-map.cjs");
+const RemixBrowser = require("./lib/compiler-webpack/browser-plugin.cjs");
 
 /** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
 
@@ -15,67 +10,30 @@ const mode =
 
 /** @type { (remixConfig: RemixConfig) => import('webpack').Configuration} */
 module.exports = (remixConfig) => {
-  const routes = objectMap(remixConfig.routes, ([id, route]) => [
-    id,
-    path.resolve(
-      remixConfig.appDirectory,
-      path.dirname(route.file),
-      "__remix_browser_route__" + path.basename(route.file)
-    ),
-  ]);
-
-  /** @type {Record<string,string>} */
-  const entry = {
-    "entry.client": path.resolve(
-      remixConfig.appDirectory,
-      remixConfig.entryClientFile
-    ),
-    ...routes,
-  };
-
   return {
-    mode,
-    devtool: mode === "development" ? "inline-cheap-source-map" : undefined,
+    mode, // user-land
+    devtool: mode === "development" ? "inline-cheap-source-map" : undefined, // user-land
 
-    context: remixConfig.rootDirectory,
-    target: "web",
     resolve: {
       alias: {
-        "~": remixConfig.appDirectory,
         // TODO grab aliases from tsconfig
+        "~": remixConfig.appDirectory, // user-land
       },
-      extensions: [".tsx", ".ts", ".jsx", ".js", ".mjs"],
-      fallback: Object.fromEntries(builtinModules.map((m) => [m, false])),
+      extensions: [".tsx", ".ts", ".jsx", ".js", ".mjs"], // user-land
     },
     optimization: {
-      moduleIds: "deterministic",
       runtimeChunk: "single",
       splitChunks: {
         chunks: "all",
       },
-      usedExports: true,
+      // usedExports: true,
       minimize: mode === "production",
       minimizer: [new ESBuildMinifyPlugin({ target: "es2019" })],
     },
-    // TODO move `module` stuff to plugin. warn/fail if user sets this to something other than module
-    experiments: { outputModule: true },
-    externalsType: "module",
-    entry,
+    entry: RemixBrowser.entry(remixConfig),
     module: {
       rules: [
-        {
-          // TODO: summary of when you need this
-          // https://github.com/aws-amplify/amplify-js/issues/7260#issuecomment-840750788
-          test: /\.m?js$/,
-          resolve: { fullySpecified: false },
-        },
-        {
-          test: /\/__remix_browser_route__/,
-          loader: require.resolve(
-            "./lib/compiler-webpack/browser-routes-loader.cjs"
-          ),
-          options: { remixConfig },
-        },
+        RemixBrowser.rule(remixConfig),
         {
           test: /\.[j|t]sx?$/,
           loader: "esbuild-loader",
@@ -92,24 +50,10 @@ module.exports = (remixConfig) => {
       ],
     },
     output: {
-      path: remixConfig.assetsBuildDirectory,
-      module: true,
-      library: { type: "module" },
-      publicPath: remixConfig.publicPath,
-      filename: "[name]-[contenthash].js",
-      chunkFormat: "module",
-      chunkLoading: "import",
-      chunkFilename: "[name]-[contenthash].js",
-      assetModuleFilename: "_assets/[name]-[contenthash][ext]",
+      ...RemixBrowser.output(remixConfig),
     },
     plugins: [
-      // TODO define plugin vs environment plugin?
-      new webpack.EnvironmentPlugin({
-        REMIX_DEV_SERVER_WS_PORT: JSON.stringify(remixConfig.devServerPort),
-      }),
-      new VirtualModulesPlugin(objectMap(routes, ([, route]) => [route, ""])),
-      new webpack.IgnorePlugin({ resourceRegExp: /\.server(\.[t|j]sx?)?$/ }),
-      new webpack.ProvidePlugin({ React: ["react"] }),
+      RemixBrowser.plugin(remixConfig),
     ],
   };
 };

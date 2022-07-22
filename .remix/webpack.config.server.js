@@ -6,8 +6,9 @@ const VirtualModulesPlugin = require("webpack-virtual-modules");
 /** @typedef {import("@remix-run/dev/compiler/assets").AssetsManifest} AssetsManifest */
 /** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
 
-const mode = "development";
-// process.env.NODE_ENV === "development" ? "development" : "production";
+const mode =
+  "development";
+  // process.env.NODE_ENV === "development" ? "development" : "production";
 
 /** @type { (remixConfig: RemixConfig, manifest: AssetsManifest) => webpack.Configuration} */
 module.exports = (remixConfig, manifest) => {
