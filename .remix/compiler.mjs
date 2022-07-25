@@ -3,7 +3,7 @@ import { createRequire } from "module";
 import { readConfig } from "@remix-run/dev/config.js";
 
 import { build } from "./lib/build.mjs";
-import { createCompileBrowser, createCompileServer } from "./lib/compiler-webpack/index.mjs";
+import { createCompileBrowser, createCompileServer } from "./lib/compiler-webpack.mjs";
 // import { createCompileBrowser, createCompileServer } from "./lib/compiler-esbuild/index.mjs";
 
 const require = createRequire(import.meta.url);

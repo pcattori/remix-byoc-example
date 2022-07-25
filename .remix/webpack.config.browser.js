@@ -1,6 +1,5 @@
 const { ESBuildMinifyPlugin } = require("esbuild-loader");
 
-const RemixBrowser = require("./lib/compiler-webpack/browser-plugin.cjs");
 const RemixWebpack = require("@remix-run/webpack")
 
 /** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
@@ -54,7 +53,7 @@ module.exports = (remixConfig) => {
       ...RemixWebpack.browser.output(remixConfig),
     },
     plugins: [
-      RemixBrowser.plugin(remixConfig),
+      RemixWebpack.browser.plugin(remixConfig),
     ],
   };
 };

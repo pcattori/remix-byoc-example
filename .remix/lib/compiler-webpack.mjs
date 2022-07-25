@@ -1,9 +1,9 @@
 import path from "path";
 
 import webpack from "webpack";
-import { getExports } from "../get-exports.cjs";
+import { getExports } from "./get-exports.cjs";
 
-import { objectMap } from "../object-map.cjs";
+import { objectMap } from "./object-map.cjs";
 
 /** @typedef {import("@remix-run/dev/compiler/assets").AssetsManifest} AssetsManifest */
 /** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
