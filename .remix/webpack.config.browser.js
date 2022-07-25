@@ -1,12 +1,11 @@
 const { ESBuildMinifyPlugin } = require("esbuild-loader");
 
-const RemixWebpack = require("@remix-run/webpack")
+const RemixWebpack = require("@remix-run/webpack");
 
 /** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
 
-const mode =
-  "development"
-  // process.env.NODE_ENV === "development" ? "development" : "production";
+const mode = "development";
+// process.env.NODE_ENV === "development" ? "development" : "production";
 
 /** @type { (remixConfig: RemixConfig) => import('webpack').Configuration} */
 module.exports = (remixConfig) => {
@@ -16,7 +15,6 @@ module.exports = (remixConfig) => {
 
     resolve: {
       alias: {
-        // TODO grab aliases from tsconfig
         "~": remixConfig.appDirectory, // user-land
       },
       extensions: [".tsx", ".ts", ".jsx", ".js", ".mjs"], // user-land
@@ -26,7 +24,6 @@ module.exports = (remixConfig) => {
       splitChunks: {
         chunks: "all",
       },
-      // usedExports: true,
       minimize: mode === "production",
       minimizer: [new ESBuildMinifyPlugin({ target: "es2019" })],
     },
@@ -52,8 +49,6 @@ module.exports = (remixConfig) => {
     output: {
       ...RemixWebpack.browser.output(remixConfig),
     },
-    plugins: [
-      RemixWebpack.browser.plugin(remixConfig),
-    ],
+    plugins: [RemixWebpack.browser.plugin(remixConfig)],
   };
 };
