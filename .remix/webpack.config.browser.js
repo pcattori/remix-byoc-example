@@ -1,6 +1,7 @@
 const { ESBuildMinifyPlugin } = require("esbuild-loader");
 
 const RemixBrowser = require("./lib/compiler-webpack/browser-plugin.cjs");
+const RemixWebpack = require("@remix-run/webpack")
 
 /** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
 
@@ -30,10 +31,10 @@ module.exports = (remixConfig) => {
       minimize: mode === "production",
       minimizer: [new ESBuildMinifyPlugin({ target: "es2019" })],
     },
-    entry: RemixBrowser.entry(remixConfig),
+    entry: RemixWebpack.browser.entry(remixConfig),
     module: {
       rules: [
-        RemixBrowser.rule(remixConfig),
+        RemixWebpack.browser.rule(remixConfig),
         {
           test: /\.[j|t]sx?$/,
           loader: "esbuild-loader",
@@ -50,7 +51,7 @@ module.exports = (remixConfig) => {
       ],
     },
     output: {
-      ...RemixBrowser.output(remixConfig),
+      ...RemixWebpack.browser.output(remixConfig),
     },
     plugins: [
       RemixBrowser.plugin(remixConfig),
