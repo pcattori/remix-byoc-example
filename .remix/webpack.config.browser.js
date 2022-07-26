@@ -1,36 +1,22 @@
-const { ESBuildMinifyPlugin } = require("esbuild-loader");
-
 const RemixWebpack = require("@remix-run/webpack");
 
 /** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
 
-const mode = "development";
-// process.env.NODE_ENV === "development" ? "development" : "production";
+const mode = process.env.NODE_ENV === "development" ? "development" : "production";
 
 /** @type { (remixConfig: RemixConfig) => import('webpack').Configuration} */
 module.exports = (remixConfig) => {
-  return {
-    mode, // user-land
-    devtool: mode === "development" ? "inline-cheap-source-map" : undefined, // user-land
-
+  let webpackConfig = {
+    mode,
+    devtool: mode === "development" ? "inline-cheap-source-map" : undefined,
     resolve: {
       alias: {
-        "~": remixConfig.appDirectory, // user-land
+        "~": remixConfig.appDirectory,
       },
-      extensions: [".tsx", ".ts", ".jsx", ".js", ".mjs"], // user-land
+      extensions: [".tsx", ".ts", ".jsx", ".js"],
     },
-    optimization: {
-      runtimeChunk: "single",
-      splitChunks: {
-        chunks: "all",
-      },
-      minimize: mode === "production",
-      minimizer: [new ESBuildMinifyPlugin({ target: "es2019" })],
-    },
-    entry: RemixWebpack.browser.entry(remixConfig),
     module: {
       rules: [
-        RemixWebpack.browser.rule(remixConfig),
         {
           test: /\.[j|t]sx?$/,
           loader: "esbuild-loader",
@@ -46,9 +32,10 @@ module.exports = (remixConfig) => {
         },
       ],
     },
-    output: {
-      ...RemixWebpack.browser.output(remixConfig),
-    },
-    plugins: [RemixWebpack.browser.plugin(remixConfig)],
   };
+  return RemixWebpack.browser.merge(
+    RemixWebpack.browser.recommended(mode),
+    webpackConfig,
+    RemixWebpack.browser.required(remixConfig),
+  );
 };
