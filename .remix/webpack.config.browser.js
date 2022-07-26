@@ -33,9 +33,9 @@ module.exports = (remixConfig) => {
       ],
     },
   };
-  return RemixWebpack.browser.merge(
+  return RemixWebpack.merge(
     RemixWebpack.browser.recommended(mode),
     webpackConfig,
-    RemixWebpack.browser.required(remixConfig),
+    RemixWebpack.browser.config(remixConfig),
   );
 };
