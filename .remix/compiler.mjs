@@ -1,6 +1,6 @@
 import { createRequire } from "module";
 
-import { readConfig } from "@remix-run/dev/config.js";
+import { readConfig } from "@remix-run/dev/dist/config.js";
 
 import { build } from "./lib/build.mjs";
 import { createCompileBrowser, createCompileServer } from "./lib/compiler-webpack.mjs";
