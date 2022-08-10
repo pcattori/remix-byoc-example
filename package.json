@@ -27,6 +27,8 @@
   "dependencies": {
     "@prisma/client": "^3.14.0",
     "@reach/dialog": "^0.17.0",
+    "@remix-run/compiler": "file:../../remix-run/dist/packages/compiler",
+    "@remix-run/compiler-webpack": "file:../../remix-run/dist/packages/compiler-webpack",
     "@remix-run/node": "^1.6.7",
     "@remix-run/react": "^1.6.7",
     "@remix-run/serve": "^1.6.7",

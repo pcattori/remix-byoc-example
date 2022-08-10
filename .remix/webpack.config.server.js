@@ -1,12 +1,8 @@
 const RemixWebpack = require("@remix-run/webpack");
 
-/** @typedef {import("@remix-run/dev/compiler/assets").AssetsManifest} AssetsManifest */
-/** @typedef {import("@remix-run/dev/config").RemixConfig} RemixConfig */
-/** @typedef {import("webpack").Configuration} WebpackConfiguration  */
-
 const mode = process.env.NODE_ENV === "development" ? "development" : "production";
 
-/** @type { (remixConfig: RemixConfig, manifest: AssetsManifest) => WebpackConfiguration} */
+/** @type { import("@remix-run/compiler-webpack").GetWebpackConfigServer } */
 module.exports = (remixConfig, manifest) => {
   let webpackConfig = {
     mode,
