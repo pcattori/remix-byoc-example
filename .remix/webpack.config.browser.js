@@ -1,4 +1,4 @@
-const RemixWebpack = require("@remix-run/webpack");
+const {config: RemixWebpack} = require("@remix-run/compiler-webpack");
 
 const mode = process.env.NODE_ENV === "development" ? "development" : "production";
 
