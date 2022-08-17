@@ -1,7 +1,7 @@
 import { createRequire } from "module";
 
 import { readConfig } from "@remix-run/dev/dist/config.js";
-import { build, makeRemixCompiler, watch } from "@remix-run/compiler";
+import { build, makeRemixCompiler } from "@remix-run/compiler";
 import {
   createBrowserCompiler,
   createServerCompiler,
@@ -9,7 +9,7 @@ import {
 
 const require = createRequire(import.meta.url);
 
-async function buildCommand() {
+async function command() {
   console.time("Remix Compile");
   let remixConfig = await readConfig();
   let compiler = makeRemixCompiler(remixConfig, {
@@ -22,13 +22,4 @@ async function buildCommand() {
   });
 }
 
-async function watchCommand() {
-  let remixConfig = await readConfig();
-  watch(remixConfig, {
-    browser: createBrowserCompiler(require("./webpack.config.browser.js")),
-    server: createServerCompiler(require("./webpack.config.server.js")),
-  });
-}
-
-// buildCommand();
-watchCommand();
+command()
