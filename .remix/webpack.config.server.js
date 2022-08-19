@@ -2,8 +2,7 @@ const {config: RemixWebpack} = require("@remix-run/compiler-webpack");
 
 const mode = process.env.NODE_ENV === "development" ? "development" : "production";
 
-/** @type { import("@remix-run/compiler-webpack").GetWebpackConfigServer } */
-module.exports = (remixConfig, manifest) => {
+module.exports = (remixConfig) => {
   let webpackConfig = {
     mode,
     devtool: mode === "development" ? "inline-cheap-source-map" : undefined,
@@ -33,5 +32,5 @@ module.exports = (remixConfig, manifest) => {
       ],
     },
   };
-  return RemixWebpack.merge(webpackConfig, RemixWebpack.server.config(remixConfig, manifest))
+  return RemixWebpack.merge(webpackConfig, RemixWebpack.server.config(remixConfig))
 };

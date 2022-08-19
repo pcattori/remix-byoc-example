@@ -2,7 +2,6 @@ const {config: RemixWebpack} = require("@remix-run/compiler-webpack");
 
 const mode = process.env.NODE_ENV === "development" ? "development" : "production";
 
-/** @type { import("@remix-run/compiler-webpack").GetWebpackConfigBrowser } */
 module.exports = (remixConfig) => {
   let webpackConfig = {
     mode,
