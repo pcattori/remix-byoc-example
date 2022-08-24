@@ -16,13 +16,17 @@ import {
   useLoaderData,
   useLocation,
 } from "@remix-run/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { Dialog } from "@reach/dialog";
 import reachDialogStylesheet from "@reach/dialog/styles.css";
 import { getUser } from "./session.server";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { dangerButtonClasses, submitButtonClasses } from "./components";
+let Hello = ()=> null
+if(browser) {
+   Hello = lazy(() => import('app2/hello'))
+}
 
 export const links: LinksFunction = () => {
   return [
@@ -55,6 +59,7 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
+      <Suspense fallback='loading remote...'><Hello/></Suspense>
         <Outlet />
         {user ? <LogoutTimer /> : null}
         <ScrollRestoration />

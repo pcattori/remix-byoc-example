@@ -16,10 +16,11 @@ async function command() {
     browser: createBrowserCompiler(require("./webpack.config.browser.js")),
     server: createServerCompiler(require("./webpack.config.server.js")),
   });
-  const { browser, server } = build(remixConfig, compiler);
-  await Promise.all([browser, server]).then(([a, b]) => {
-    console.timeEnd("Remix Compile");
-  });
+  await build(remixConfig, compiler);
+  console.timeEnd("Remix Compile");
+
+  // await Promise.all([browser, server]).then(([a, b]) => {
+  // });
 }
 
 command()

@@ -4,7 +4,7 @@
   "scripts": {
     "byobuild": "node .remix/build.mjs",
     "byowatch": "node .remix/watch.mjs",
-    "byodev": "node .remix/dev.mjs",
+    "byodev": "cross-env NODE_ENV=development node .remix/dev.mjs",
     "build": "run-s build:*",
     "build:css": "npm run generate:css -- --minify",
     "build:remix": "remix build",
@@ -28,10 +28,10 @@
   "dependencies": {
     "@prisma/client": "^3.14.0",
     "@reach/dialog": "^0.17.0",
-    "@remix-run/channel": "../../remix-run/dist/packages/channel",
-    "@remix-run/compiler": "../../remix-run/dist/packages/compiler/",
-    "@remix-run/compiler-webpack": "../../remix-run/dist/packages/compiler-webpack/",
-    "@remix-run/dev-server": "../../remix-run/dist/packages/dev-server/",
+    "@remix-run/channel": "../remix-byoc/dist/packages/channel",
+    "@remix-run/compiler": "../remix-byoc/dist/packages/compiler/",
+    "@remix-run/compiler-webpack": "../remix-byoc/dist/packages/compiler-webpack/",
+    "@remix-run/dev-server": "../remix-byoc/dist/packages/dev-server/",
     "@remix-run/node": "^1.6.7",
     "@remix-run/react": "^1.6.7",
     "@remix-run/serve": "^1.6.7",

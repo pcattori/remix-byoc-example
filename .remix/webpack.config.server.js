@@ -1,4 +1,5 @@
 const {config: RemixWebpack} = require("@remix-run/compiler-webpack");
+const { DefinePlugin } = require("webpack");
 
 const mode = process.env.NODE_ENV === "development" ? "development" : "production";
 
@@ -13,6 +14,12 @@ module.exports = (remixConfig) => {
       },
       extensions: [".tsx", ".ts", ".jsx", ".js"],
     },
+    externals: [/node_modules/],
+    plugins: [
+      new DefinePlugin({
+        browser: "undefined"
+      }),
+    ],
     module: {
       rules: [
         {
