@@ -4,6 +4,7 @@
   "scripts": {
     "byobuild": "node .remix/build.mjs",
     "byowatch": "node .remix/watch.mjs",
+    "byodev": "node .remix/dev.mjs",
     "build": "run-s build:*",
     "build:css": "npm run generate:css -- --minify",
     "build:remix": "remix build",
