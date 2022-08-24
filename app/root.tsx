@@ -59,7 +59,7 @@ export default function App() {
         {user ? <LogoutTimer /> : null}
         <ScrollRestoration />
         <Scripts />
-        {/* <LiveReload /> */}
+        <LiveReload />
       </body>
     </html>
   );
