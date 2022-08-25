@@ -18,9 +18,6 @@ async function command() {
   });
   await build(remixConfig, compiler);
   console.timeEnd("Remix Compile");
-
-  // await Promise.all([browser, server]).then(([a, b]) => {
-  // });
 }
 
 command()
