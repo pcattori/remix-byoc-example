@@ -28,10 +28,9 @@
   "dependencies": {
     "@prisma/client": "^3.14.0",
     "@reach/dialog": "^0.17.0",
-    "@remix-run/channel": "../../remix-run/dist/packages/channel",
-    "@remix-run/compiler": "../../remix-run/dist/packages/compiler/",
-    "@remix-run/compiler-webpack": "../../remix-run/dist/packages/compiler-webpack/",
-    "@remix-run/dev-server": "../../remix-run/dist/packages/dev-server/",
+    "@remix-run/compiler": "../remix-byoc/packages/compiler/dist",
+    "@remix-run/compiler-webpack": "../remix-byoc/packages/compiler-webpack/dist",
+    "@remix-run/dev-server": "../remix-byoc/packages/dev-server/dist",
     "@remix-run/node": "^1.6.7",
     "@remix-run/react": "^1.6.7",
     "@remix-run/serve": "^1.6.7",
